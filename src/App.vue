@@ -4,8 +4,13 @@ import { ref } from "vue";
 const showForm = ref(false);
 const newMemo = ref("");
 const memos = ref([]);
+const errorMessage = ref("");
 
 function addMemo() {
+  if (!newMemo.value) {
+    errorMessage.value = "Please enter a memo";
+    return;
+  }
   memos.value.push({
     id: Date.now(),
     memo: newMemo.value,
@@ -15,6 +20,10 @@ function addMemo() {
 
   newMemo.value = "";
   showForm.value = false;
+}
+
+function deleteMemo(id) {
+  memos.value = memos.value.filter((memo) => memo.id !== id);
 }
 
 function getRandomColor() {
@@ -30,9 +39,17 @@ function getRandomColor() {
         <button @click="showForm = true" class="header-button">+</button>
       </header>
       <div class="card-container">
-        <div v-for="(memo, index) in memos" class="card" :key="index" :style="{ backgroundColor: memo.backgroundColor}">
+        <div
+          v-for="(memo, index) in memos"
+          class="card"
+          :key="index"
+          :style="{ backgroundColor: memo.backgroundColor }"
+        >
           <p class="card-content">{{ memo.memo }}</p>
-          <p class="card-date">{{ memo.date }}</p>
+          <div class="card-footer">
+            <p class="card-date">{{ memo.date }}</p>
+            <button @click="deleteMemo(memo.id)" class="card-button">x</button>
+          </div>
         </div>
       </div>
     </div>
@@ -42,6 +59,7 @@ function getRandomColor() {
         <button @click="showForm = false" class="form-close-btn">
           &times;
         </button>
+        <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
         <textarea
           v-model="newMemo"
           name="memo"
@@ -154,5 +172,14 @@ header {
   border: none;
   font-size: 30px;
   cursor: pointer;
+}
+.form-error {
+  color: red;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
